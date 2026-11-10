@@ -1,8 +1,5 @@
-# main.py — full desk start (Plan B)
 import asyncio
-import json
-from pathlib import Path
-
+import os
 from db import init
 from config import Settings
 from agents.scanner import Scanner
@@ -12,18 +9,13 @@ from agents.executor import Executor
 from agents.risk import Risk
 from telegram import poll_loop
 
-SECRETS = json.loads(Path("os.environ").read_text())
-DATA_PATH = SECRETS["DATA_PATH"]
-
 async def main():
     init()
     settings = Settings(None)
-    print(f"=== Grok Bot Desk starting ===")
+    print("=== Grok Bot Desk starting ===")
     print(f"Mode: {settings.get('desk.mode')}")
-    print(f"FOMO handle: {settings.get('desk.fomo_handle')}")
-    print(f"DATA_PATH: {DATA_PATH}")
-    print(f"JSON: web/d/{DATA_PATH}/")
-    print(f"Telegram owner locked")
+    print(f"FOMO handle: {os.environ.get('FOMO_HANDLE', 'skylinerya')}")
+    print("Telegram owner locked")
 
     scanner = Scanner()
     auditor = Auditor()
@@ -39,7 +31,6 @@ async def main():
         executor.run(),
         risk.run(),
         poll_loop(),
-        # json writer can be added back here
     )
 
 if __name__ == "__main__":
