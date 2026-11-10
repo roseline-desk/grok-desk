@@ -1,8 +1,7 @@
-# db.py — schema (STEP 4) + helpers
 import sqlite3
 from pathlib import Path
 
-DB_PATH = Path("/workspace/artifacts/desk/desk.db")
+DB_PATH = Path("desk.db")
 
 def connect():
     conn = sqlite3.connect(DB_PATH, check_same_thread=False)
