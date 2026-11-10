@@ -1,7 +1,7 @@
 import asyncio
 import os
 from db import init
-from config import Settings
+from config import settings
 from agents.scanner import Scanner
 from agents.auditor import Auditor
 from agents.analyst import Analyst
@@ -11,7 +11,6 @@ from telegram import poll_loop
 
 async def main():
     init()
-    settings = Settings(None)
     print("=== Grok Bot Desk starting ===")
     print(f"Mode: {settings.get('desk.mode')}")
     print(f"FOMO handle: {os.environ.get('FOMO_HANDLE', 'skylinerya')}")
