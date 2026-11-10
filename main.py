@@ -1,12 +1,10 @@
 import asyncio
 import os
-from pathlib import Path
-
 from fastapi import FastAPI
 from fastapi.staticfiles import StaticFiles
 import uvicorn
 
-from db import init
+from db import init, connect
 from config import settings
 from agents.scanner import Scanner
 from agents.auditor import Auditor
@@ -16,12 +14,25 @@ from agents.risk import Risk
 from telegram import poll_loop
 
 app = FastAPI()
+
+@app.get("/api/state")
+async def api_state():
+    conn = connect()
+    act = conn.execute("SELECT COUNT(*) FROM activity").fetchone()[0]
+    conn.close()
+    return {
+        "balance": 200.0,
+        "today_pct": 0.0,
+        "mode": "PAPER",
+        "agents_running": 5,
+        "activity_count": act,
+    }
+
 app.mount("/", StaticFiles(directory="web", html=True), name="web")
 
 async def desk():
     init()
     print("=== Grok Bot Desk starting ===")
-    print(f"Mode: {settings.get('desk.mode')}")
     scanner = Scanner()
     auditor = Auditor()
     analyst = Analyst()
@@ -43,4 +54,4 @@ async def startup():
 
 if __name__ == "__main__":
     port = int(os.environ.get("PORT", 8000))
-    uvicorn.run(app, host="0.0.0.0", port=port)
+    uvicorn.run("main:app", host="0.0.0.0", port=port)
