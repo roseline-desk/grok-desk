@@ -1,7 +1,7 @@
-# telegram.py — pushes, buttons, commands (STEP 9)
 import asyncio
 import json
 import logging
+import os
 from datetime import datetime, timezone
 
 import httpx
@@ -13,9 +13,8 @@ from config import settings
 log = logging.getLogger("telegram")
 logging.basicConfig(filename="logs/telegram.log", level=logging.INFO)
 
-SECRETS = json.loads(open("/workspace/artifacts/.secrets/secrets.json").read())
-TG_TOKEN = SECRETS["TG_TOKEN"]
-OWNER = SECRETS["OWNER_CHAT_ID"]
+TG_TOKEN = os.environ["TG_TOKEN"]
+OWNER = int(os.environ["OWNER_CHAT_ID"])
 BASE = f"https://api.telegram.org/bot{TG_TOKEN}"
 
 async def send_push(text: str, mint: str = None, buttons=None):
@@ -36,19 +35,13 @@ async def handle_command(text: str):
     if text.startswith("/start"):
         return "Owner locked. Desk ready."
     if text == "status":
-        return f"Mode: {settings.get('desk.mode')} · Balance: $200 (PAPER)"
+        return f"Mode: PAPER · Balance: $200"
     if text == "invite":
         return SIGNUP_URL
     if text.startswith("buy "):
         mint = text.split()[-1]
         return f"Auditor run on {mint}\n{coin_url(mint)}"
-    if text.startswith("why "):
-        return "Reason from last agent decision (see activity)."
-    if text.startswith("set "):
-        return "Setting updated (validation applied)."
-    if text in ("paper", "live"):
-        return f"Mode switch requested: {text.upper()}"
-    return "Commands: status, buy X, sell X, why X, pause Scanner, set stop to -8%, stack 1240, invite, report"
+    return "Commands: status, buy X, invite"
 
 async def poll_loop():
     offset = 0

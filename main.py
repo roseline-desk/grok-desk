@@ -12,7 +12,7 @@ from agents.executor import Executor
 from agents.risk import Risk
 from telegram import poll_loop
 
-SECRETS = json.loads(Path("/workspace/artifacts/.secrets/secrets.json").read_text())
+SECRETS = json.loads(Path("os.environ").read_text())
 DATA_PATH = SECRETS["DATA_PATH"]
 
 async def main():
